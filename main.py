@@ -1,15 +1,21 @@
 from utils import *
 
+# FORMAT_TEST = r'C:\Users\admin\.src-code\python\Word2Quiz\content\scan-formatstyle.docx'
+LINE_TEST = r'C:\Users\admin\.src-code\python\Word2Quiz\content\scan-linebyline.docx'
+TABLE_TEST = r'C:\Users\admin\.src-code\python\Word2Quiz\content\scan-table.docx'
+
+GEO_CASE = r'C:\Users\admin\.src-code\python\Word2Quiz\content\testcasegeo.docx'
+BIO_CASE = r'C:\Users\admin\.src-code\python\Word2Quiz\content\testcasebio.docx'
+
 
 def main(doc_dir):
     print(convertDoc2Txt(doc_dir))
 
 
 if __name__ == '__main__':
+    print(f"Line Test==========: \n {convertDoc2Txt(GEO_CASE)}")
 
-    # ? Current Available Configuration: Table Variations and Line By Line
-    inputDoc = r"C:\Users\admin\.src-code\python\Word2Quiz\content\test.docx"
-    main(inputDoc)
+    # main(inputDoc)
 
 """
 TODO MAIN LIST:
