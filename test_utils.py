@@ -104,9 +104,9 @@ case3 = {
 
 
 @pytest.mark.parametrize("test_input, expectation", [
-    (r'C:\Users\admin\.src-code\python\Word2Quiz\testcases\case1.docx', case1),
-    (r'C:\Users\admin\.src-code\python\Word2Quiz\testcases\case2.docx', case2),
-    (r'C:\Users\admin\.src-code\python\Word2Quiz\testcases\case3.docx', case3)
+    (r'.\testcases\case1.docx', case1),
+    (r'.\testcases\case2.docx', case2),
+    (r'.\testcases\case3.docx', case3)
 ])
 def test_converter(test_input, expectation):
     assert questionIdentification(filterer(convertDoc2Txt(test_input))) == expectation
