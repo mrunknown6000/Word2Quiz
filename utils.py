@@ -1,29 +1,9 @@
 import docx2txt
 
-""" TEXT CONVERSION INFRASTRUCTURE
-- Convert .docx file into raw string text                   CHECKED
-- Removing all whitespace                                   CHECKED 
-- Question Identification Filterer:                         PENDING
-  + Trigger Word: "Câu", "A.", "B.", "C.", "D."
-  + Answer Identification: Manual Notation ;-;
-- Dictionary Filtering:
-  + Key <Question No.> -> Deeper Level Dictionary
-    * Title: "String"
-    * CorrectAns: 0->3 (ABCD)
-    * List all answer
-Eg: 
-1: {
-  title: "This is a title",
-  correctAns: "A",
-  options: ["Answer1", "Answer2", "Answer3", "Answer4"]
-}
-"""
-
 
 def convertDoc2Txt(doc_direct: str) -> str:
     try:
         text = docx2txt.process(doc_direct)
-        text = filterer(text)
         return text
     except Exception:
         print("Error Occurred While Converting!")
@@ -37,6 +17,57 @@ def filterer(raw_string_inp: str) -> str:
     return finalized
 
 
-def questionIdentification(formated_string: str) -> dict:
+def questionIdentification(formatted_string: str) -> dict:
     finalized = {}
+    formatted_string += " Câu 69420"
+    wordsByWord = formatted_string.split()
+    SPECIAL_CHAR = "<-"
+
+    titleCounter = 0
+    titleList = []
+    temporaryStringIdentifier = ""
+    optionList = []
+    answerList = []
+    temporaryList = []
+    # Filtered Everything
+    for word in wordsByWord:
+        if ("A." in word) or ("B." in word) or ("C." in word) or ("D." in word):
+            # Check if the ID is title:
+            if titleCounter == 0 or ((titleCounter % 4) == 0):
+                titleList.append(temporaryStringIdentifier)
+            else:  # Check if it not title
+                if SPECIAL_CHAR in temporaryStringIdentifier:
+                    answerList.append(temporaryStringIdentifier.replace("<-", ""))
+                    temporaryList.append(temporaryStringIdentifier.replace("<-", ""))
+                else:
+                    temporaryList.append(temporaryStringIdentifier)
+
+            temporaryStringIdentifier = ""
+            titleCounter += 1
+        elif word == "Câu":
+            if titleCounter != 0:
+                if SPECIAL_CHAR in temporaryStringIdentifier:
+                    answerList.append(temporaryStringIdentifier.replace("<-", ""))
+                    temporaryList.append(temporaryStringIdentifier.replace("<-", ""))
+                else:
+                    temporaryList.append(temporaryStringIdentifier)
+                optionList.append(temporaryList)
+                temporaryList = []
+            temporaryStringIdentifier = ""
+            temporaryStringIdentifier += word
+        else:
+            temporaryStringIdentifier += " " + word
+    del temporaryList, temporaryStringIdentifier, titleCounter
+    titleList = tuple(titleList)
+    optionList = tuple(optionList)
+    answerList = tuple(answerList)
+
+    for questionId in range(len(titleList)):
+        finalized[questionId] = {}
+        finalized[questionId]["title"] = titleList[questionId]
+        finalized[questionId]["answer"] = answerList[questionId]
+        finalized[questionId]["options"] = optionList[questionId]
+
+        # print(titleList)
+        # print(optionList)
     return finalized
