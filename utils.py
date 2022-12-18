@@ -5,8 +5,11 @@ def convertDoc2Txt(doc_direct: str) -> str:
     try:
         text = docx2txt.process(doc_direct)
         return text
-    except Exception:
-        print("Error Occurred While Converting!")
+    except PermissionError:
+        print("Error: File Access Denial!")
+        exit(1)
+    except FileNotFoundError:
+        print("Error: File Not Found")
         exit(1)
 
 
@@ -61,13 +64,16 @@ def questionIdentification(formatted_string: str) -> dict:
     titleList = tuple(titleList)
     optionList = tuple(optionList)
     answerList = tuple(answerList)
-
-    for questionId in range(len(titleList)):
-        finalized[questionId] = {}
-        finalized[questionId]["title"] = titleList[questionId]
-        finalized[questionId]["answer"] = answerList[questionId]
-        finalized[questionId]["options"] = optionList[questionId]
+    try:
+        for questionId in range(len(titleList)):
+            finalized[questionId] = {}
+            finalized[questionId]["title"] = titleList[questionId]
+            finalized[questionId]["answer"] = answerList[questionId]
+            finalized[questionId]["options"] = optionList[questionId]
+    except IndexError:
+        print("Error: Failed to filtering the file")
 
         # print(titleList)
         # print(optionList)
     return finalized
+
