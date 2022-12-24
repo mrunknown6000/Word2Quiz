@@ -2,10 +2,10 @@
 For all the one who have tirely copying questions by questions for 4-6 hours straight doing nothing just copying which can be both ineffective and inefficient. So this program gonna help yall so no more boring copying lol.
 
 ## Installation
-You can download this at ... and yes, no installation. This is a standalone program so you only need to execute this from your command line.
+You can download this at [the release]{https://github.com/mrunknown6000/Word2Quiz/releases/tag/stable} and yes, no installation. This is a standalone program so you only need to execute this from your command line.
 
 ## How To Use
-1. Download the executable from ...
+1. Download the executable from [the release page]{https://github.com/mrunknown6000/Word2Quiz/releases/tag/stable}.
 2. Preparing the word file according to the file format below.
 3. Type in the directory, email and password for your quizzi account.
 4. After the automation process done, do manual saving then press Enter to quit out of the program.
