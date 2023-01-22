@@ -1,20 +1,43 @@
+# This code was made by MrUnknown6000
+
 import docx2txt
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import selenium.common.exceptions as exc
 from selenium.webdriver.common.action_chains import ActionChains
+import json
+import os
 
 
+# Section For Configuration Options
+# * Load Configuration File Attempt
+def loadConfig() -> dict or None:
+    CONF_DIR = os.getenv('APPDATA') + '\\word2quiz-conf.json'
+    loadedConfig = {}
+    try:
+        with open(CONF_DIR, 'r', encoding='UTF-8') as f:
+            loadedConfig = json.load(f)
+            return loadedConfig
+    except FileNotFoundError:
+        with open(CONF_DIR, 'x') as f:
+            pass
+
+
+def writeConfig() -> None:
+    pass
+
+
+# Section For The Algorithms
 def convertDoc2Txt(doc_direct: str) -> str:
     try:
         text = docx2txt.process(doc_direct)
         return text
     except PermissionError:
-        print("Lỗi | Truy cập bị từ chối")
+        print("ERROR: Permission Denied")
         exit(1)
     except FileNotFoundError:
-        print("Lỗi | File không tồn tại")
+        print("ERROR: File Not Found")
         exit(1)
 
 
@@ -25,11 +48,13 @@ def filterer(raw_string_inp: str) -> str:
     return finalized
 
 
-def questionIdentification(formatted_string: str) -> dict:
+def questionIdentification(formatted_string: str, config: dict) -> dict:
     finalized = {}
-    formatted_string += " Câu 69420"
+    formatted_string += f" {config['keys']['headmark']} !@#$%^&*"
     wordsByWord = formatted_string.split()
-    SPECIAL_CHAR = "<-"
+    HEADER_CHAR = config['keys']['headmark']
+    SPECIAL_CHAR = config['keys']['ansmark']
+    OPTION_KEYS = config['keys']['options']
 
     titleCounter = 0
     titleList = []
@@ -39,24 +64,24 @@ def questionIdentification(formatted_string: str) -> dict:
     temporaryList = []
     # Filtered Everything
     for word in wordsByWord:
-        if ("A." in word) or ("B." in word) or ("C." in word) or ("D." in word):
+        if (OPTION_KEYS[0] in word) or (OPTION_KEYS[1] in word) or (OPTION_KEYS[2] in word) or (OPTION_KEYS[3] in word):
             # Check if the ID is title:
             if titleCounter == 0 or ((titleCounter % 4) == 0):
                 titleList.append(temporaryStringIdentifier)
             else:  # Check if it not title
                 if SPECIAL_CHAR in temporaryStringIdentifier:
-                    answerList.append(temporaryStringIdentifier.replace("<-", ""))
-                    temporaryList.append(temporaryStringIdentifier.replace("<-", ""))
+                    answerList.append(temporaryStringIdentifier.replace(SPECIAL_CHAR, ""))
+                    temporaryList.append(temporaryStringIdentifier.replace(SPECIAL_CHAR, ""))
                 else:
                     temporaryList.append(temporaryStringIdentifier)
 
             temporaryStringIdentifier = ""
             titleCounter += 1
-        elif word == "Câu":
+        elif word == HEADER_CHAR:
             if titleCounter != 0:
                 if SPECIAL_CHAR in temporaryStringIdentifier:
-                    answerList.append(temporaryStringIdentifier.replace("<-", ""))
-                    temporaryList.append(temporaryStringIdentifier.replace("<-", ""))
+                    answerList.append(temporaryStringIdentifier.replace(SPECIAL_CHAR, ""))
+                    temporaryList.append(temporaryStringIdentifier.replace(SPECIAL_CHAR, ""))
                 else:
                     temporaryList.append(temporaryStringIdentifier)
                 optionList.append(temporaryList)
@@ -76,13 +101,11 @@ def questionIdentification(formatted_string: str) -> dict:
             finalized[questionId]["answer"] = answerList[questionId]
             finalized[questionId]["options"] = optionList[questionId]
     except IndexError:
-        print("Lỗi | Lỗi ký hiệu, kiểm tra lại file")
-
-        # print(titleList)
-        # print(optionList)
+        print("ERROR: Filter Indexer failed")
     return finalized
 
 
+# Networking Algorithms
 def connectionApplier(driver, questions_dictionary, email, password):
     driver.get("https://www.quizizz.com/login")
     actions = ActionChains(driver)
@@ -158,8 +181,10 @@ def connectionApplier(driver, questions_dictionary, email, password):
             )
             driver.execute_script('arguments[0].click();', driver.find_element(By.XPATH,
                                                                                '//*[@id="__layout"]/div/div[3]/div/div/div/div/div[2]/div[1]/button'))
-
-        breakpoint()
+        quitConfirmation = input("Please complete the procedure of saving the quiz then press enter to quit... ")
+        if quitConfirmation == '':
+            print('Thank for using the programing | Credit: MrUnknown6000')
+            driver.close()
     #     USER INPUT
     except exc.TimeoutException:
-        print("Lỗi | Mạng chậm quá .-.")
+        print("ERROR: Timeout")
