@@ -1,3 +1,4 @@
 test-driver.py
 .pytest_cache
 __pycache__/
+/.venv/
