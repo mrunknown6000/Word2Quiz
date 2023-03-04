@@ -86,7 +86,7 @@ def questionIdentification(formatted_string: str) -> dict:
 def connectionApplier(driver, questions_dictionary, email, password):
     driver.get("https://www.quizizz.com/login")
     actions = ActionChains(driver)
-
+    print('Đang kết nối vào quizizz.com...')
     # Login Screen -> Choose Email Option -> Create Quiz Screen
     WebDriverWait(driver, 30).until(
         EC.presence_of_element_located((
@@ -105,17 +105,17 @@ def connectionApplier(driver, questions_dictionary, email, password):
             EC.presence_of_element_located((By.CLASS_NAME, 'continue-button'))
         )
         driver.find_element(By.CLASS_NAME, 'continue-button').click()
-
+        print('Đang đăng nhập vào tài khoản Quizzi...')
         # Keyboard Navigate to Quiz Generate Area
         # driver.implicitly_wait(4)
         WebDriverWait(driver, 30).until(
             EC.presence_of_element_located((By.CLASS_NAME, 'admin-external-link'))
         )
         driver.find_element(By.CLASS_NAME, 'admin-external-link').click()
-
-        # ================= LOOP FOR EACH QUESTION ================
+        print('Đang vào menu tạo Quiz...')
+        # ? ================= LOOP FOR EACH QUESTION ================
         # Initial Loop hole
-        WebDriverWait(driver, 30).until(
+        WebDriverWait(driver, 60).until(
             EC.presence_of_element_located(
                 (By.XPATH, '//*[@id="__layout"]/div/div[3]/main/div[1]/div/div[2]/div[2]/div/div[2]/div[1]/button'))
         )
@@ -123,7 +123,8 @@ def connectionApplier(driver, questions_dictionary, email, password):
                             '//*[@id="__layout"]/div/div[3]/main/div[1]/div/div[2]/div[2]/div/div[2]/div[1]/button').click()
 
         for questionStack in questions_dictionary.values():
-            # Actually Process all the question
+
+            # ? ================================= WRITE THE QUESTION AND THE ANSWER =================================
             WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located(
                     (By.XPATH, '//*[@id="questionQuery"]'))
@@ -134,23 +135,26 @@ def connectionApplier(driver, questions_dictionary, email, password):
             actions.send_keys(questionStack['title'])
             actions.perform()
             for i in range(len(questionStack['options'])):
-                driver.find_element(By.XPATH, f'//*[@id="option-{i}"]').click()
+                driver.find_element(By.ID, f"option-{i}").click()
                 actions.send_keys(questionStack['options'][i])
                 actions.perform()
                 if questionStack['options'][i] == questionStack['answer']:
                     driver.find_element(By.XPATH,
-                                        f'//*[@id="__layout"]/div/div[3]/div/div/div/div/div/div/div[2]/div[1]/div/div[3]/div/ul/li[{i + 1}]/div/div[1]/div[3]/button').click()
-            # Save Button
+                                        f"//*[@id=\"__layout\"]/div/div[3]/div/div/div/div/div/div/div/div[2]/div[1]/div/div[3]/div/ul/li[{i + 1}]/div/div[1]/div[3]/button").click()
             driver.find_element(By.XPATH,
-                                '//*[@id="__layout"]/div/div[3]/div/div/div/div/div/div/div[2]/div[2]/div[1]/div/button').click()
-            # New Question Wizard
+                                '//*[@id="__layout"]/div/div[3]/div/div/div/div/div/div/div/div[2]/div[2]/div/div/button').click()
+            # ? ================================= ONE QUESTION LOOP DONE =================================
+
+            # ? ================================= GENERATING A NEW CYCLE =================================
             if questionStack['title'] == questions_dictionary[len(questions_dictionary) - 1]['title']:
                 break
             WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located(
-                    (By.CLASS_NAME, 'quick-add-action'))
+                    (By.XPATH,
+                     '//*[@id="__layout"]/div/div[3]/main/div[1]/div[1]/div[2]/div[3]/div/div/div[2]/div[3]/div/button'))
             )
-            driver.execute_script('arguments[0].click();', driver.find_element(By.CLASS_NAME, 'quick-add-action'))
+            driver.execute_script('arguments[0].click();', driver.find_element(By.XPATH,
+                                                                               '//*[@id="__layout"]/div/div[3]/main/div[1]/div[1]/div[2]/div[3]/div/div/div[2]/div[3]/div/button'))
             WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located((
                     By.XPATH, '//*[@id="__layout"]/div/div[3]/div/div/div/div/div[2]/div[1]/button'
@@ -158,8 +162,12 @@ def connectionApplier(driver, questions_dictionary, email, password):
             )
             driver.execute_script('arguments[0].click();', driver.find_element(By.XPATH,
                                                                                '//*[@id="__layout"]/div/div[3]/div/div/div/div/div[2]/div[1]/button'))
+        #     ? ===================================== COMPLETED ALL QUESTION ==============================================================
+        print('================================= Đã Làm Quiz xong! =================================')
+        print('Hãy lưu lại Quiz và tắt cửa số trình duyệt')
+        input('Ấn Enter để thoát...')
+        driver.quit()
+        print('Cảm ơn đã sử dụng - Credit: MrUnknown850')
 
-        breakpoint()
-    #     USER INPUT
     except exc.TimeoutException:
         print("Lỗi | Mạng chậm quá .-.")
